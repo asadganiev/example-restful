@@ -1,0 +1,196 @@
+openapi: 3.0.2
+info:
+  title: Paynet RESTFul Spring Boot Project
+  description: Paynet Interview Task
+  termsOfService: terms
+  contact:
+    name: Asad Ganiev
+    url: https://twitter.com/asadganiev
+    email: asadganiev@gmail.com
+  version: "1.0"
+servers:
+  - url: http://localhost:9000
+    description: Spring Boot Local Server
+paths:
+  /v1/users/signup:
+    post:
+      tags:
+        - Users
+      summary: New User
+      description: Register New User
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        201:
+          description: User Created
+          headers:
+            Location:
+              description: Location of the created customer
+              style: simple
+              explode: false
+              schema:
+                type: string
+                format: uri
+                example: http://example.com/v1/users/{assignedIdValue}
+        400:
+          description: Bad Request
+        409:
+          description: Conflict
+  /v1/user/login:
+    post:
+      tags:
+        - Users
+      summary: login
+      description: PaynetUser login
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        201:
+          description: PaynetUser Created
+          headers:
+            Location:
+              description: Location of the created customer
+              style: simple
+              explode: false
+              schema:
+                type: string
+                format: uri
+                example: http://example.com/v1/users/{assignedIdValue}
+        400:
+          description: Bad Request
+        409:
+          description: Conflict
+components:
+  schemas:
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          example: Alisher Navai 33a
+        region:
+          type: string
+          example: Samarkand
+        city:
+          type: string
+          example: Samarkand
+        zipCode:
+          type: integer
+          example: 33701
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        login:
+          maxLength: 50
+          minLength: 2
+          type: string
+          example: johndoe
+        password:
+          maxLength: 50
+          minLength: 2
+          type: string
+          example: "******"
+        firstName:
+          maxLength: 100
+          minLength: 2
+          type: string
+          example: John
+        lastName:
+          maxLength: 100
+          minLength: 2
+          type: string
+          example: Doe
+        address:
+          $ref: '#/components/schemas/Address'
+      description: PaynetUser Object
+    PagedResponse:
+      type: object
+      properties:
+        pageable:
+          $ref: '#/components/schemas/PagedResponse_pageable'
+        totalPages:
+          type: integer
+          format: int32
+        last:
+          type: boolean
+        totalElements:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        number:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/PagedResponse_pageable_sort'
+        first:
+          type: boolean
+    PagedResponse_pageable_sort:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+    PagedResponse_pageable:
+      type: object
+      properties:
+        sort:
+          $ref: '#/components/schemas/PagedResponse_pageable_sort'
+        offset:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+  parameters:
+    PageNumberParam:
+      name: pageNumber
+      in: query
+      description: Page Number
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 1
+    PageSizeParam:
+      name: pageSize
+      in: query
+      description: Page Size
+      required: false
+      style: form
+      explode: true
+      schema:
+        type: integer
+        format: int32
+        default: 25
+  securitySchemes:
+    JwtAuthToken:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
