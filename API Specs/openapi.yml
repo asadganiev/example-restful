@@ -39,7 +39,7 @@ paths:
         400:
           description: Bad Request
         409:
-          description: Conflict
+          description: User with such username already exists
   /v1/user/login:
     post:
       tags:
@@ -70,21 +70,6 @@ paths:
           description: Conflict
 components:
   schemas:
-    Address:
-      type: object
-      properties:
-        street:
-          type: string
-          example: Alisher Navai 33a
-        region:
-          type: string
-          example: Samarkand
-        city:
-          type: string
-          example: Samarkand
-        zipCode:
-          type: integer
-          example: 33701
     User:
       type: object
       properties:
@@ -92,28 +77,44 @@ components:
           type: string
           format: uuid
           readOnly: true
-        login:
+        username:
           maxLength: 50
           minLength: 2
           type: string
           example: johndoe
         password:
           maxLength: 50
-          minLength: 2
+          minLength: 8
           type: string
           example: "******"
         firstName:
-          maxLength: 100
+          maxLength: 50
           minLength: 2
           type: string
           example: John
         lastName:
-          maxLength: 100
+          maxLength: 50
           minLength: 2
           type: string
           example: Doe
-        address:
-          $ref: '#/components/schemas/Address'
+        street:
+          type: string
+          maxLength: 100
+          minLength: 2
+          example: Alisher Navai 33a
+        region:
+          type: string
+          maxLength: 100
+          minLength: 2
+          example: Samarkand
+        city:
+          type: string
+          maxLength: 100
+          minLength: 2
+          example: Samarkand
+        zipCode:
+          type: integer
+          example: 33701
       description: PaynetUser Object
     PagedResponse:
       type: object

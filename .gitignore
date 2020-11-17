@@ -71,6 +71,3 @@ buildNumber.properties
 mvnw
 mvnw.cmd
 pom.xml
-src/main/java/uz/paynet/rest/
-src/main/resources/
-src/test/java/uz/paynet/rest/
