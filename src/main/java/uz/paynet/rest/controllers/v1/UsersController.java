@@ -11,11 +11,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import uz.paynet.rest.dto.UserDto;
 import uz.paynet.rest.error.ResponseModel;
 import uz.paynet.rest.services.Users;
 import uz.paynet.rest.users.PaynetUser;
 
 import javax.validation.Valid;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,6 +27,7 @@ public class UsersController {
 
     private Users users;
     private BCryptPasswordEncoder encoder;
+    private DateTimeFormatter formatter;
 
     @Autowired
     public UsersController(Users users, BCryptPasswordEncoder encoder) {
@@ -35,7 +39,7 @@ public class UsersController {
     @PostMapping(value = "/users/signup",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Object> signUp(@Valid @RequestBody PaynetUser user,
+    public ResponseEntity<Object> signUp(@Valid @RequestBody UserDto user,
                                          BindingResult result) {
 
         if (result.hasErrors()) {
@@ -54,7 +58,7 @@ public class UsersController {
 
             HttpHeaders headers = new HttpHeaders();
 
-            PaynetUser newUser = users.save(user);
+            PaynetUser newUser = users.save(dtoToUser(user));
 
             headers.add("Location", "/v1/users/" + newUser.getId());
 
@@ -68,6 +72,32 @@ public class UsersController {
                     new ResponseModel(HttpStatus.CONFLICT,
                             "User with such username already exists"),
                     HttpStatus.CONFLICT);
+        }
+    }
+
+    private PaynetUser dtoToUser(UserDto userDto) {
+
+        try {
+            PaynetUser user = new PaynetUser();
+
+            user.setUsername(userDto.getUsername());
+            user.setPassword(userDto.getPassword());
+            user.setFirstName(userDto.getFirstName());
+            user.setLastName(userDto.getLastName());
+            user.setStreet(userDto.getStreet());
+            user.setRegion(userDto.getRegion());
+            user.setCity(userDto.getCity());
+            user.setZipCode(userDto.getZipCode());
+
+            formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+            user.setBirthday(LocalDate.parse(userDto.getBirthday(), formatter));
+
+            return user;
+
+
+        } catch (Exception e) {
+            return null;
         }
     }
 }

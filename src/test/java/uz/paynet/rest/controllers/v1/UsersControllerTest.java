@@ -10,6 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
+import uz.paynet.rest.dto.UserDto;
 import uz.paynet.rest.services.UserDetailsServiceImpl;
 import uz.paynet.rest.services.Users;
 import uz.paynet.rest.users.PaynetUser;
@@ -56,7 +57,7 @@ class UsersControllerTest {
     @Test
     void signUpWithBadRequest() throws Exception {
 
-        PaynetUser user = new PaynetUser();
+        UserDto user = new UserDto();
 
         Map<String, String> fieldErrors = new HashMap<>();
 
@@ -79,44 +80,70 @@ class UsersControllerTest {
 
                 field.setAccessible(true);
 
-                // Blank username
-                field.set(user, "");
+                if (!fieldName.equals("birthday")) {
 
-                mockMvc.perform(post("/v1/users/signup")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(content().string(containsString(
-                                        fieldName.toLowerCase() + " should not be blank")));
+                    // Blank input
+                    field.set(user, "");
 
-                // Short input
-                field.set(user, "1");
+                    mockMvc.perform(post("/v1/users/signup")
+                            .content(asJsonString(user))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest())
+                            .andExpect(content().string(containsString(
+                                    fieldName.toLowerCase() + " should not be blank")));
 
-                mockMvc.perform(post("/v1/users/signup")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(
-                                content().string(containsString(fieldErrors.get(fieldName))));
+                    // Short input
+                    field.set(user, "1");
 
-                // Long input
-                field.set(user, "veryLongInputValueThatContainsMoreThanFiftyCharacters" +
-                        "veryLongInputValueThatContainsMoreThanFiftyCharacters");
+                    mockMvc.perform(post("/v1/users/signup")
+                            .content(asJsonString(user))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest())
+                            .andExpect(
+                                    content().string(containsString(fieldErrors.get(fieldName))));
 
-                mockMvc.perform(post("/v1/users/signup")
-                        .content(asJsonString(user))
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .accept(MediaType.APPLICATION_JSON))
-                        .andExpect(status().isBadRequest())
-                        .andExpect(
-                                content().string(containsString(fieldErrors.get(fieldName))));
+                    // Long input
+                    field.set(user, "veryLongInputValueThatContainsMoreThanFiftyCharacters" +
+                            "veryLongInputValueThatContainsMoreThanFiftyCharacters");
+
+                    mockMvc.perform(post("/v1/users/signup")
+                            .content(asJsonString(user))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest())
+                            .andExpect(
+                                    content().string(containsString(fieldErrors.get(fieldName))));
+                } else {
+
+                    field.set(user, "");
+
+                    mockMvc.perform(post("/v1/users/signup")
+                            .content(asJsonString(user))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest())
+                            .andExpect(
+                                    content().string(containsString(
+                                            "birthday should not be empty")));
+
+                    field.set(user, null);
+
+                    mockMvc.perform(post("/v1/users/signup")
+                            .content(asJsonString(user))
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .accept(MediaType.APPLICATION_JSON))
+                            .andExpect(status().isBadRequest())
+                            .andExpect(
+                                    content().string(containsString(
+                                            "birthday should not be empty")));
+                }
             }
         }
     }
 
-    private void initUser(PaynetUser user) {
+    private void initUser(UserDto user) {
 
         user.setUsername("username");
         user.setPassword("password");
@@ -125,13 +152,14 @@ class UsersControllerTest {
         user.setRegion("Samarkand");
         user.setCity("Samarkand");
         user.setStreet("Baker St 221B");
+        user.setBirthday("01-01-2000");
         user.setZipCode(140100);
     }
 
     @Test
     void signUpWhenUserDoesNotExist() throws Exception {
 
-        PaynetUser user = new PaynetUser();
+        UserDto user = new UserDto();
 
         initUser(user);
 
@@ -153,7 +181,7 @@ class UsersControllerTest {
     @Test
     void signUpWhenUserExists() throws Exception {
 
-        PaynetUser user = new PaynetUser();
+        UserDto user = new UserDto();
 
         initUser(user);
 
