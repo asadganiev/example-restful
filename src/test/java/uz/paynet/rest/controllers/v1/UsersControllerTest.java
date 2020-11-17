@@ -11,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import uz.paynet.rest.dto.UserDto;
+import uz.paynet.rest.services.PasswordEncoderImpl;
 import uz.paynet.rest.services.UserDetailsServiceImpl;
 import uz.paynet.rest.services.Users;
 import uz.paynet.rest.users.PaynetUser;
@@ -26,7 +27,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@MockBean(classes = {BCryptPasswordEncoder.class})
+@MockBean(classes = {BCryptPasswordEncoder.class, PasswordEncoderImpl.class})
 @WebMvcTest(controllers = UsersController.class)
 class UsersControllerTest {
 
@@ -197,5 +198,12 @@ class UsersControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(
                         content().string(containsString("User with such username already exists")));
+    }
+
+    @Test
+    void userUpdate() {
+
+
+
     }
 }

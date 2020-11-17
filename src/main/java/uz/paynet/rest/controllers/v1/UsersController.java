@@ -5,7 +5,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uz.paynet.rest.dto.UserDto;
 import uz.paynet.rest.error.ResponseModel;
+import uz.paynet.rest.services.PasswordEncoderImpl;
 import uz.paynet.rest.services.Users;
 import uz.paynet.rest.users.PaynetUser;
 
@@ -26,11 +26,11 @@ import java.util.stream.Collectors;
 public class UsersController {
 
     private Users users;
-    private BCryptPasswordEncoder encoder;
+    private PasswordEncoderImpl encoder;
     private DateTimeFormatter formatter;
 
     @Autowired
-    public UsersController(Users users, BCryptPasswordEncoder encoder) {
+    public UsersController(Users users, PasswordEncoderImpl encoder) {
 
         this.users = users;
         this.encoder = encoder;
@@ -94,7 +94,6 @@ public class UsersController {
             user.setBirthday(LocalDate.parse(userDto.getBirthday(), formatter));
 
             return user;
-
 
         } catch (Exception e) {
             return null;
