@@ -5,10 +5,13 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import uz.paynet.rest.error.ResponseModel;
 import uz.paynet.rest.forms.UserRegistrationForm;
+import uz.paynet.rest.forms.UserUpdateForm;
 import uz.paynet.rest.services.PasswordEncoderImpl;
 import uz.paynet.rest.services.Users;
 import uz.paynet.rest.users.PaynetUser;
@@ -16,6 +19,7 @@ import uz.paynet.rest.users.PaynetUser;
 import javax.validation.Valid;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -71,15 +75,21 @@ public class UsersController {
         }
     }
 
-    @GetMapping(value = "/users/test",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
+    @GetMapping(value = "/users/{userId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> test() {
+    public ResponseEntity<Object> getUser(@PathVariable("userId") Long userId) {
 
-        return new ResponseEntity<>("test", HttpStatus.CONFLICT);
+        final Optional<PaynetUser> user = users.getUserById(userId);
+
+        return user.<ResponseEntity<Object>>map(
+                paynetUser ->
+                        new ResponseEntity<>(paynetUser, HttpStatus.CONFLICT))
+                .orElseGet(()
+                        -> new ResponseEntity<>(new ResponseModel(HttpStatus.NOT_FOUND,
+                        "User with such id doesn't exist."), HttpStatus.NOT_FOUND));
     }
 
-   /* @PutMapping(value = "/users/update",
+    @PutMapping(value = "/users/update",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> update(@Valid @RequestBody UserUpdateForm userData,
@@ -97,27 +107,28 @@ public class UsersController {
 
         } else {
 
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            final String username = getUsername();
 
-            System.out.println(auth.getPrincipal());
+            if (users.update(toUserEntity(username, userData)) != null) {
 
-            if (users.findByUsername(user.getUsername()) == null) {
-
-
-                user.setPassword(encoder.encode(user.getPassword()));
-
-                PaynetUser newUser = users.save(toUserEntity(user));
-
-                HttpHeaders headers = new HttpHeaders();
-                headers.add("Location", "/v1/users/" + newUser.getId());
-
-                return new ResponseEntity<>(
-                        new ResponseModel(HttpStatus.CREATED, "User Created"),
-                        headers, HttpStatus.CREATED);
-
+                return new ResponseEntity<>(HttpStatus.OK);
             }
         }
-    }*/
+
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    private String getUsername() {
+
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String username;
+        if (principal instanceof UserDetails) {
+            username = ((UserDetails) principal).getUsername();
+        } else {
+            username = principal.toString();
+        }
+        return username;
+    }
 
     private PaynetUser toUserEntity(UserRegistrationForm userRegistrationForm) {
 
@@ -136,6 +147,31 @@ public class UsersController {
             formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
 
             user.setBirthday(LocalDate.parse(userRegistrationForm.getBirthday(), formatter));
+
+            return user;
+
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    private PaynetUser toUserEntity(String username, UserUpdateForm updateForm) {
+
+        try {
+            PaynetUser user = new PaynetUser();
+
+            user.setUsername(username);
+            user.setPassword(updateForm.getPassword());
+            user.setFirstName(updateForm.getFirstName());
+            user.setLastName(updateForm.getLastName());
+            user.setStreet(updateForm.getStreet());
+            user.setRegion(updateForm.getRegion());
+            user.setCity(updateForm.getCity());
+            user.setZipCode(updateForm.getZipCode());
+
+            formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+            user.setBirthday(LocalDate.parse(updateForm.getBirthday(), formatter));
 
             return user;
 

@@ -1,5 +1,6 @@
 package uz.paynet.rest.users;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -13,7 +14,9 @@ public class PaynetUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+    @Column(unique = true)
     private String username;
+    @JsonIgnore
     private String password;
     private String firstName;
     private String lastName;
