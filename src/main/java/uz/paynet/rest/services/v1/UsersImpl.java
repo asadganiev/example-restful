@@ -26,6 +26,14 @@ public class UsersImpl implements Users {
     @Override
     public PaynetUser findByUsername(String username) {
 
-        return null;
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public PaynetUser findByUsernameAndPassword(String username, String password) {
+
+        System.out.println("username = [" + username + "], password = [" + password + "]");
+
+        return userRepository.findByUsernameAndPassword(username, password);
     }
 }

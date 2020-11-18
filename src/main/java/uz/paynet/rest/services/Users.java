@@ -7,4 +7,6 @@ public interface Users {
     PaynetUser save(PaynetUser user);
 
     PaynetUser findByUsername(String username);
+
+    PaynetUser findByUsernameAndPassword(String username, String password);
 }

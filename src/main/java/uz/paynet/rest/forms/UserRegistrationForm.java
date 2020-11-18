@@ -1,4 +1,4 @@
-package uz.paynet.rest.dto;
+package uz.paynet.rest.forms;
 
 import lombok.Data;
 import uz.paynet.rest.annotations.ValidBirthday;
@@ -7,7 +7,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
 @Data
-public class UserDto {
+public class UserRegistrationForm {
 
     @NotBlank(message = "username should not be blank")
     @Size(min = 2, max = 50, message = "username length should be 2-50")

@@ -6,4 +6,6 @@ import uz.paynet.rest.users.PaynetUser;
 public interface UserRepository extends JpaRepository<PaynetUser, Long> {
 
     PaynetUser findByUsername(String username);
+
+    PaynetUser findByUsernameAndPassword(String username, String password);
 }

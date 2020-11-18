@@ -10,7 +10,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
-import uz.paynet.rest.dto.UserDto;
+import uz.paynet.rest.forms.UserRegistrationForm;
 import uz.paynet.rest.services.PasswordEncoderImpl;
 import uz.paynet.rest.services.UserDetailsServiceImpl;
 import uz.paynet.rest.services.Users;
@@ -58,7 +58,7 @@ class UsersControllerTest {
     @Test
     void signUpWithBadRequest() throws Exception {
 
-        UserDto user = new UserDto();
+        UserRegistrationForm user = new UserRegistrationForm();
 
         Map<String, String> fieldErrors = new HashMap<>();
 
@@ -144,7 +144,7 @@ class UsersControllerTest {
         }
     }
 
-    private void initUser(UserDto user) {
+    private void initUser(UserRegistrationForm user) {
 
         user.setUsername("username");
         user.setPassword("password");
@@ -160,7 +160,7 @@ class UsersControllerTest {
     @Test
     void signUpWhenUserDoesNotExist() throws Exception {
 
-        UserDto user = new UserDto();
+        UserRegistrationForm user = new UserRegistrationForm();
 
         initUser(user);
 
@@ -182,7 +182,7 @@ class UsersControllerTest {
     @Test
     void signUpWhenUserExists() throws Exception {
 
-        UserDto user = new UserDto();
+        UserRegistrationForm user = new UserRegistrationForm();
 
         initUser(user);
 
@@ -198,12 +198,5 @@ class UsersControllerTest {
                 .andExpect(status().isConflict())
                 .andExpect(
                         content().string(containsString("User with such username already exists")));
-    }
-
-    @Test
-    void userUpdate() {
-
-
-
     }
 }
