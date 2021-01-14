@@ -5,7 +5,6 @@ import com.example.rest.services.UserDetailsServiceImpl;
 import com.example.rest.services.Users;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -36,7 +35,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
 
         http.cors().and().csrf().disable().authorizeRequests()
-                .antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll()
+                .antMatchers(SIGN_UP_URL, "/v3/api-docs/**", "/swagger-ui.html", "/swagger-ui/**")
+                .permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .logout()
