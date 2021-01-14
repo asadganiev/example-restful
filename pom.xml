@@ -9,11 +9,11 @@
         <version>2.4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>uz.paynet</groupId>
-    <artifactId>paynet-restful</artifactId>
+    <groupId>com.example</groupId>
+    <artifactId>example-restful</artifactId>
     <version>1.0</version>
-    <name>paynet-restful</name>
-    <description>Restful Paynet Interview Project</description>
+    <name>example-restful</name>
+    <description>Restful Example Project</description>
 
     <properties>
         <java.version>11</java.version>
@@ -71,6 +71,11 @@
             <artifactId>junit-jupiter-params</artifactId>
             <version>5.7.0</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+            <version>1.5.2</version>
         </dependency>
     </dependencies>
 
